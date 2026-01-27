@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+venv/
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Outputs (generated files)
+outputs/*.csv
+
+# Logs
+*.log
+
+# Excel temp files
+~$*.xlsx
+
+# MySQL dumps / local configs
+*.cnf
