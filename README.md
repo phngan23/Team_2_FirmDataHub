@@ -83,7 +83,11 @@ cd "C:\Program Files\MySQL\MySQL Server 8.4\bin" # hoặc tìm trong Program Fil
 .\mysql -u root -p
 ```
 Then enter your password to connect MySQL.
-If you see "<mysql>" then run:
+If you see 
+```text
+<mysql>
+```
+then run:
 ```bash
 source sql/schema_and_seed.sql;
 # if error, run:
