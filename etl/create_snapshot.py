@@ -18,16 +18,17 @@ import mysql.connector
 import argparse
 from datetime import datetime
 import sys
+from getpass import getpass
 
 # ============================================================
 # DATABASE CONFIGURATION
 # ============================================================
+password = getpass("Enter MySQL password: ")
 
-# ⚠️ Update password if needed
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '123456',
+    'password': password,
     'database': 'team2_firmhub'
 }
 
