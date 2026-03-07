@@ -1,4 +1,5 @@
 -- Database setup
+DROP DATABASE IF EXISTS team2_firmhub;
 CREATE DATABASE IF NOT EXISTS team2_firmhub 
     CHARACTER SET utf8mb4 
     COLLATE utf8mb4_unicode_ci;
@@ -76,17 +77,7 @@ CREATE TABLE `dim_industry_l2` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Industry classification level 2';
 
--- Seed data for dim_industry_l2
-INSERT INTO `dim_industry_l2` VALUES 
-(1, 'Tài nguyên Cơ bản'),
-(2, 'Thực phẩm và đồ uống'),
-(3, 'Hóa chất'),
-(4, 'Dầu khí'),
-(5, 'Hàng & Dịch vụ Công nghiệp'),
-(6, 'Hàng cá nhân & Gia dụng'),
-(7, 'Xây dựng và Vật liệu'),
-(8, 'Ô tô và phụ tùng'),
-(9, 'Y tế');
+-- No seed data - industry_l2 will be imported from Excel
 
 -- ----------------------------------------------------------------
 -- Table: dim_firm
@@ -141,33 +132,7 @@ CREATE TABLE `fact_data_snapshot` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Data snapshot versioning';
 
--- Seed snapshots for 2020-2024 (5 years × 4 sources = 20 snapshots)
-INSERT INTO `fact_data_snapshot` 
-(snapshot_date, fiscal_year, source_id, version_tag, created_by) VALUES
--- Ownership snapshots (source_id=1: FiinPro)
-('2021-01-20', 2020, 1, 'v1', 'system'),
-('2022-01-20', 2021, 1, 'v1', 'system'),
-('2023-01-20', 2022, 1, 'v1', 'system'),
-('2024-01-20', 2023, 1, 'v1', 'system'),
-('2025-01-20', 2024, 1, 'v1', 'system'),
--- Financial statement snapshots (source_id=2: BCTC_Audited)
-('2021-03-31', 2020, 2, 'v1', 'system'),
-('2022-03-31', 2021, 2, 'v1', 'system'),
-('2023-03-31', 2022, 2, 'v1', 'system'),
-('2024-03-31', 2023, 2, 'v1', 'system'),
-('2025-03-31', 2024, 2, 'v1', 'system'),
--- Market data snapshots (source_id=3: Vietstock)
-('2021-01-05', 2020, 3, 'v1', 'system'),
-('2022-01-05', 2021, 3, 'v1', 'system'),
-('2023-01-05', 2022, 3, 'v1', 'system'),
-('2024-01-05', 2023, 3, 'v1', 'system'),
-('2025-01-05', 2024, 3, 'v1', 'system'),
--- Annual report snapshots (source_id=4: AnnualReport)
-('2021-04-15', 2020, 4, 'v1', 'system'),
-('2022-04-15', 2021, 4, 'v1', 'system'),
-('2023-04-15', 2022, 4, 'v1', 'system'),
-('2024-04-15', 2023, 4, 'v1', 'system'),
-('2025-04-15', 2024, 4, 'v1', 'system');
+-- NOTE: SNAPSHOTS WILL BE CREATED BY SEPARATE SCRIPT
 
 -- ----------------------------------------------------------------
 -- Table: fact_financial_year
