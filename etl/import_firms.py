@@ -90,85 +90,98 @@ def firm_exists(ticker):
 
 insert_count = 0
 update_count = 0
+error_count = 0
 
-for _, row in df.iterrows():
+try:
+    for idx, row in df.iterrows():
+        try:
+            ticker = row["ticker"]
 
-    ticker = row["ticker"]
+            exchange_id = get_exchange_id(row["exchange_code"])
+            industry_id = get_or_create_industry(row["industry_l2_name"])
 
-    exchange_id = get_exchange_id(row["exchange_code"])
-    industry_id = get_or_create_industry(row["industry_l2_name"])
+            existing = firm_exists(ticker)
 
-    existing = firm_exists(ticker)
+            if existing:
+                # -------- UPDATE --------
+                update_sql = """
+                    UPDATE dim_firm
+                    SET
+                        company_name = %s,
+                        exchange_id = %s,
+                        industry_l2_id = %s,
+                        founded_year = %s,
+                        listed_year = %s,
+                        updated_at = %s
+                    WHERE ticker = %s
+                """
 
-    if existing:
-        # -------- UPDATE --------
-        update_sql = """
-            UPDATE dim_firm
-            SET
-                company_name = %s,
-                exchange_id = %s,
-                industry_l2_id = %s,
-                founded_year = %s,
-                listed_year = %s,
-                updated_at = %s
-            WHERE ticker = %s
-        """
+                cursor.execute(update_sql, (
+                    row["company_name"],
+                    exchange_id,
+                    industry_id,
+                    row["founded_year"],
+                    row["listed_year"],
+                    datetime.now(),
+                    ticker
+                ))
 
-        cursor.execute(update_sql, (
-            row["company_name"],
-            exchange_id,
-            industry_id,
-            row["founded_year"],
-            row["listed_year"],
-            datetime.now(),
-            ticker
-        ))
+                update_count += 1
 
-        update_count += 1
+            else:
+                # -------- INSERT --------
+                insert_sql = """
+                    INSERT INTO dim_firm (
+                        firm_id,
+                        ticker,
+                        company_name,
+                        exchange_id,
+                        industry_l2_id,
+                        founded_year,
+                        listed_year,
+                        status,
+                        created_at,
+                        updated_at
+                    )
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """
 
-    else:
-        # -------- INSERT --------
-        insert_sql = """
-            INSERT INTO dim_firm (
-                firm_id,
-                ticker,
-                company_name,
-                exchange_id,
-                industry_l2_id,
-                founded_year,
-                listed_year,
-                status,
-                created_at,
-                updated_at
-            )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """
+                cursor.execute(insert_sql, (
+                    row["firm_id"],
+                    ticker,
+                    row["company_name"],
+                    exchange_id,
+                    industry_id,
+                    row["founded_year"],
+                    row["listed_year"],
+                    "active",
+                    datetime.now(),
+                    datetime.now()
+                ))
 
-        cursor.execute(insert_sql, (
-            row["firm_id"],
-            ticker,
-            row["company_name"],
-            exchange_id,
-            industry_id,
-            row["founded_year"],
-            row["listed_year"],
-            "ACTIVE",
-            datetime.now(),
-            datetime.now()
-        ))
+                insert_count += 1
 
-        insert_count += 1
+        except Exception as e:
+            error_count += 1
+            print(f"❌ Error at row {idx+1} ({ticker}): {e}")
+            continue
 
+    # ===============================
+    # COMMIT
+    # ===============================
+    conn.commit()
 
-# ===============================
-# COMMIT
-# ===============================
-conn.commit()
+    print("=================================")
+    print(f"Inserted: {insert_count}")
+    print(f"Updated : {update_count}")
+    print(f"Errors  : {error_count}")
+    print("Import completed ✅")
 
-print("=================================")
-print(f"Inserted: {insert_count}")
-print(f"Updated : {update_count}")
-print("Import completed ✅")
+except Exception as e:
+    conn.rollback()
+    print(f"❌ Fatal error: {e}")
+    print("All changes rolled back.")
 
-cursor.close()
-conn.close()
+finally:
+    cursor.close()
+    conn.close()
