@@ -19,7 +19,7 @@ Main Responsibilities
 
 Output
 ------
-- outputs/qc_report.csv
+- ../outputs/qc_report.csv (parent directory, not inside etl/)
 
 QC Report Columns
 -----------------
@@ -38,34 +38,26 @@ import mysql.connector
 from getpass import getpass
 import pandas as pd
 from pathlib import Path
-from decimal import Decimal
 
 # ─── CONFIGURATION ───────────────────────────────────────────────
-password = getpass("Enter MySQL password: ")
-
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': password,
-    'database': 'team2_firmhub'
-}
 
 # QC Thresholds (configurable)
 MIN_GROWTH = -0.95
 MAX_GROWTH = 5.0
 MARKET_VALUE_TOLERANCE = 0.05  # 5%
 
-OUTPUT_DIR = Path("outputs")
+# Output directory - parent of etl/ (i.e., ../outputs/)
+OUTPUT_DIR = Path(__file__).parent.parent / "outputs"
 OUTPUT_FILE = OUTPUT_DIR / "qc_report.csv"
 
 # ─── DATABASE CONNECTION ─────────────────────────────────────────
-def get_db_connection():
-    """Establish MySQL connection with password prompt."""
-    password = getpass("Enter MySQL password: ")
+
+def get_db_connection(password):
+    """Establish MySQL connection."""
     conn = mysql.connector.connect(
-        host=DB_CONFIG['host'],
-        database=DB_CONFIG['database'],
-        user=DB_CONFIG['user'],
+        host='localhost',
+        database='team2_firmhub',
+        user='root',
         password=password
     )
     return conn
@@ -282,79 +274,8 @@ def rule6_market_value_consistency(conn):
 
 # ─── MAIN EXECUTION ──────────────────────────────────────────────
 
-def run_qc_checks():
-    """Run all QC checks and generate report."""
-    
-    print("=" * 60)
-    print("QC CHECKS - team2_firmhub")
-    print("=" * 60)
-    print()
-    
-    # Connect to database
-    print("Connecting to database...")
-    conn = get_db_connection()
-    print("✓ Connected\n")
-    
-    # Run all checks
-    all_errors = []
-    
-    print("Running QC checks...")
-    print("-" * 60)
-    
-    rules = [
-        ("Rule 1: Ownership Ratios [0,1]", rule1_ownership_ratios),
-        ("Rule 2: Shares Outstanding > 0", rule2_shares_outstanding),
-        ("Rule 3: Total Assets ≥ 0", rule3_total_assets),
-        ("Rule 4: Current Liabilities ≥ 0", rule4_current_liabilities),
-        ("Rule 5: Growth Ratio in range", rule5_growth_ratio),
-        ("Rule 6: Market Value consistency", rule6_market_value_consistency),
-    ]
-    
-    for rule_name, rule_func in rules:
-        print(f"• {rule_name}...", end=" ")
-        errors = rule_func(conn)
-        all_errors.extend(errors)
-        print(f"{len(errors)} errors")
-    
-    print("-" * 60)
-    print()
-    
-    # Close connection
-    conn.close()
-    
-    # Convert to DataFrame
-    if all_errors:
-        df_errors = pd.DataFrame(all_errors)
-        
-        # Sort by ticker, fiscal_year, field_name
-        df_errors = df_errors.sort_values(['ticker', 'fiscal_year', 'field_name'])
-        
-        # Count total records (estimate)
-        total_records = count_total_records(DB_CONFIG, getpass("Enter MySQL password again to count records: "))
-        
-        # Print summary
-        print_summary(df_errors, total_records)
-        
-        # Save to CSV
-        OUTPUT_DIR.mkdir(exist_ok=True)
-        df_errors.to_csv(OUTPUT_FILE, index=False)
-        print(f"\n✓ QC report saved to: {OUTPUT_FILE}")
-        
-    else:
-        print("=" * 60)
-        print("QC CHECKS SUMMARY")
-        print("=" * 60)
-        print("✓ NO ERRORS FOUND - All checks passed!")
-        print("=" * 60)
-
-def count_total_records(db_config, password):
+def count_total_records(conn):
     """Count approximate total records checked."""
-    conn = mysql.connector.connect(
-        host=db_config['host'],
-        database=db_config['database'],
-        user=db_config['user'],
-        password=password
-    )
     cursor = conn.cursor()
     
     # Count records in fact tables
@@ -366,14 +287,14 @@ def count_total_records(db_config, password):
         count = cursor.fetchone()[0]
         total += count
     
-    conn.close()
+    cursor.close()
     return total
 
 def print_summary(df_errors, total_records):
     """Print QC summary to console."""
-    print("=" * 60)
+    print("=" * 70)
     print("QC CHECKS SUMMARY")
-    print("=" * 60)
+    print("=" * 70)
     print(f"Total records checked: {total_records}")
     print(f"Total errors found: {len(df_errors)}")
     print()
@@ -397,7 +318,86 @@ def print_summary(df_errors, total_records):
     ticker_counts = df_errors['ticker'].value_counts().head(10)
     for ticker, count in ticker_counts.items():
         print(f"  {ticker}: {count}")
-    print("=" * 60)
+    print("=" * 70)
+
+def run_qc_checks():
+    """Run all QC checks and generate report."""
+    
+    print("=" * 70)
+    print("QC CHECKS - team2_firmhub")
+    print("=" * 70)
+    print()
+    
+    # Prompt for password ONCE
+    password = getpass("Enter MySQL password: ")
+    
+    # Connect to database
+    print("Connecting to database...")
+    conn = get_db_connection(password)
+    print("✓ Connected\n")
+    
+    # Run all checks
+    all_errors = []
+    
+    print("Running QC checks...")
+    print("-" * 70)
+    
+    rules = [
+        ("Rule 1: Ownership Ratios [0,1]", rule1_ownership_ratios),
+        ("Rule 2: Shares Outstanding > 0", rule2_shares_outstanding),
+        ("Rule 3: Total Assets ≥ 0", rule3_total_assets),
+        ("Rule 4: Current Liabilities ≥ 0", rule4_current_liabilities),
+        ("Rule 5: Growth Ratio in range", rule5_growth_ratio),
+        ("Rule 6: Market Value consistency", rule6_market_value_consistency),
+    ]
+    
+    for rule_name, rule_func in rules:
+        print(f"• {rule_name}...", end=" ")
+        errors = rule_func(conn)
+        all_errors.extend(errors)
+        print(f"{len(errors)} errors")
+    
+    print("-" * 70)
+    print()
+    
+    # Count total records (reuse same connection)
+    total_records = count_total_records(conn)
+    
+    # Close connection
+    conn.close()
+    
+    # Convert to DataFrame and save
+    if all_errors:
+        df_errors = pd.DataFrame(all_errors)
+        
+        # Sort by ticker, fiscal_year, field_name
+        df_errors = df_errors.sort_values(['ticker', 'fiscal_year', 'field_name'])
+        
+        # Print summary
+        print_summary(df_errors, total_records)
+        
+        # Create output directory if not exists
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        
+        # Save to CSV
+        df_errors.to_csv(OUTPUT_FILE, index=False, encoding='utf-8')
+        print(f"\n✓ QC report saved to: {OUTPUT_FILE}")
+        
+    else:
+        print("=" * 70)
+        print("QC CHECKS SUMMARY")
+        print("=" * 70)
+        print(f"Total records checked: {total_records}")
+        print("✓ NO ERRORS FOUND - All checks passed!")
+        print("=" * 70)
+        
+        # Still create output directory and empty CSV
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        
+        # Create empty CSV with headers
+        df_empty = pd.DataFrame(columns=['ticker', 'fiscal_year', 'field_name', 'error_type', 'message'])
+        df_empty.to_csv(OUTPUT_FILE, index=False, encoding='utf-8')
+        print(f"\n✓ Empty QC report saved to: {OUTPUT_FILE}")
 
 # ─── ENTRY POINT ─────────────────────────────────────────────────
 
