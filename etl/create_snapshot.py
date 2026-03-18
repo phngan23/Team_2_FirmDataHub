@@ -11,6 +11,7 @@ import argparse
 from datetime import datetime
 import sys
 from getpass import getpass
+import os
 
 # ============================================================
 # DATABASE CONFIGURATION
@@ -127,7 +128,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    password = getpass("Enter MySQL password: ")
+    password = os.getenv("MYSQL_PASSWORD") or getpass("Enter MySQL password: ")
 
     conn = get_connection(password)
 

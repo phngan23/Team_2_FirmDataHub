@@ -1,12 +1,18 @@
+'''
+etl/import_firms.py
+'''
+
 import pandas as pd
 import mysql.connector
 from datetime import datetime
 from getpass import getpass
+import os
+from pathlib import Path
 
 # ===============================
 # DB CONNECTION
 # ===============================
-password = getpass("Enter MySQL password: ")
+password = os.getenv("MYSQL_PASSWORD") or getpass("Enter MySQL password: ")
 
 conn = mysql.connector.connect(
     host="localhost",
@@ -20,7 +26,7 @@ cursor = conn.cursor(dictionary=True)
 # ===============================
 # LOAD EXCEL
 # ===============================
-file_path = "../data/firms.xlsx"
+file_path = Path(__file__).parent.parent / "data" / "firms.xlsx"
 
 df = pd.read_excel(file_path)
 

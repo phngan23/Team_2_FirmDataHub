@@ -4,6 +4,7 @@ init_snapshots.py
 
 from create_snapshot import create_snapshot, get_connection
 from getpass import getpass
+import os
 
 years = [2020, 2021, 2022, 2023, 2024]
 
@@ -17,7 +18,7 @@ sources = {
 def main():
     print("=== INITIALIZING SNAPSHOTS ===\n")
 
-    password = getpass("Enter MySQL password: ")
+    password = os.getenv("MYSQL_PASSWORD") or getpass("Enter MySQL password: ")
 
     conn = get_connection(password)
 
