@@ -216,7 +216,7 @@ The QC checks validate 6 data quality rules. After running the pipeline, you wil
 
 **Formula-based calculation:**
 ```
-market_value = shares_outstanding × share_price / 1,000,000,000
+market_value = shares_outstanding × share_price
 ```
 
 **CII's actual values differ by >5% from this calculation because:**
