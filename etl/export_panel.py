@@ -17,6 +17,7 @@ Output Format
 - UTF-8 encoding
 """
 
+import os
 import mysql.connector
 from getpass import getpass
 import pandas as pd
@@ -40,8 +41,8 @@ def export_panel():
     
     # Connect to database
     print("Connecting to database...")
-    password = getpass("Enter MySQL password: ")
-    
+    password = os.getenv("MYSQL_PASSWORD") or getpass("Enter MySQL password: ")
+
     conn = mysql.connector.connect(
         host='localhost',
         user='root',

@@ -38,6 +38,7 @@ import mysql.connector
 from getpass import getpass
 import pandas as pd
 from pathlib import Path
+import os
 
 # ─── CONFIGURATION ───────────────────────────────────────────────
 
@@ -329,8 +330,8 @@ def run_qc_checks():
     print()
     
     # Prompt for password ONCE
-    password = getpass("Enter MySQL password: ")
-    
+    password = os.getenv("MYSQL_PASSWORD") or getpass("Enter MySQL password: ")
+
     # Connect to database
     print("Connecting to database...")
     conn = get_db_connection(password)

@@ -1,14 +1,20 @@
+'''
+etl/import_panel.py
+'''
+
 import pandas as pd
 import mysql.connector
 from datetime import datetime
 import sys
 from getpass import getpass
 import numpy as np
+import os
+from pathlib import Path
 
 # ===============================
 # DB CONNECTION
 # ===============================
-password = getpass("Enter MySQL password: ")
+password = os.getenv("MYSQL_PASSWORD") or getpass("Enter MySQL password: ")
 
 conn = mysql.connector.connect(
     host="localhost",
@@ -22,7 +28,7 @@ cursor = conn.cursor(dictionary=True)
 # ===============================
 # LOAD EXCEL
 # ===============================
-file_path = "../data/panel_2020_2024.xlsx"
+file_path = Path(__file__).parent.parent / "data" / "panel_2020_2024.xlsx"
 
 df = pd.read_excel(file_path)
 
