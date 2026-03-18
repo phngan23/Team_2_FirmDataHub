@@ -1,5 +1,9 @@
-import subprocess
-import sys
+"""
+init_snapshots.py
+"""
+
+from create_snapshot import create_snapshot, get_connection
+from getpass import getpass
 
 years = [2020, 2021, 2022, 2023, 2024]
 
@@ -10,34 +14,37 @@ sources = {
     "AnnualReport": "04-15"
 }
 
-def run_command(cmd):
-    try:
-        result = subprocess.run(cmd, check=True, text=True)
-        print("✅ Success\n")
-    except subprocess.CalledProcessError as e:
-        print("❌ Error running:", " ".join(cmd))
-        print(e)
-        print("Continuing...\n")
-
 def main():
     print("=== INITIALIZING SNAPSHOTS ===\n")
 
-    for year in years:
-        for source, date_suffix in sources.items():
+    password = getpass("Enter MySQL password: ")
 
-            snapshot_date = f"{year+1}-{date_suffix}"
+    conn = get_connection(password)
 
-            cmd = [
-                sys.executable,   # đảm bảo dùng đúng python env
-                "create_snapshot.py",
-                "--source", source,
-                "--year", str(year),
-                "--date", snapshot_date,
-                "--version", "v1_raw"
-            ]
+    try:
+        for year in years:
+            for source, date_suffix in sources.items():
 
-            print("Running:", " ".join(cmd))
-            run_command(cmd)
+                snapshot_date = f"{year+1}-{date_suffix}"
+
+                print(f"Creating snapshot: {source} - {year}")
+
+                try:
+                    create_snapshot(
+                        conn,
+                        source_name=source,
+                        fiscal_year=year,
+                        snapshot_date=snapshot_date,
+                        version_tag="v1_raw"
+                    )
+                    print("✅ Success\n")
+
+                except Exception as e:
+                    print(f"❌ Error: {e}")
+                    print("Continuing...\n")
+
+    finally:
+        conn.close()
 
     print("=== DONE INITIALIZING SNAPSHOTS ===")
 
