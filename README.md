@@ -8,10 +8,10 @@ This project implements a Firm Data Hub for Vietnamese listed companies, includi
 ## 2. Team Members
 | Name | Student ID | Role & Responsibilities | Contribution |
 |------|------------|-------------------------|--------------|
-| **Nguyen Phuong Ngan** | 11245914 | **Team Leader:** Led the project, built the database schema, developed core ETL scripts (import, snapshot, export), and integrated the full pipeline. Also handled data collection for firms 1–5. | % |
+| **Nguyen Phuong Ngan** | 11245914 | **Team Leader:** Led the project, built the database schema, developed core ETL scripts (import, snapshot, export), and integrated the full pipeline. Also handled data collection for firms 1–5. | 30% |
 | **Vu Thi Thuy Hang** | 11245873 | **Data Quality Analyst:** Collected data for firms 6–10, validated ownership and market data, and implemented QC checks. | 25% |
-| **Ta Ngoc Anh** | 11245844 | **Data & Documentation:** Collected data for firms 11–15, gathered innovation data (10 firms), and prepared the data dictionary, and reviewed the entire project after completion. | % |
-| **Le Pham Khanh Linh** | 11245892 | **Database Design:** Collected data for firms 16–20, gathered innovation data (10 firms), and designed the ERD and relational schema, and reviewed the entire project after completion. | % |
+| **Ta Ngoc Anh** | 11245844 | **Data & Documentation:** Collected data for firms 11–15, gathered innovation data (10 firms), and prepared the data dictionary, and reviewed the entire project after completion. | 22.5% |
+| **Le Pham Khanh Linh** | 11245892 | **Database Design:** Collected data for firms 16–20, gathered innovation data (10 firms), and designed the ERD and relational schema, and reviewed the entire project after completion. | 22.5% |
 
 ## 3. Project Structure
 ```text
