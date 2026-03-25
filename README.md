@@ -6,42 +6,43 @@ This project implements a Firm Data Hub for Vietnamese listed companies, includi
 **Dataset:** 20 Vietnamese listed firms × 5 years (2020-2024) = 100 observations with 38 variables
 
 ## 2. Team Members
-- Nguyễn Phương Ngân
-- Tạ Ngọc Ánh
-- Vũ Thị Thúy Hằng
-- Lê Phạm Khánh Linh
+
 **| Name | Student ID | Role & Responsibilities | Contribution |***
 |------|------------|-------------------------|--------------|
-| **Nguyen Phuong Ngan** | 11245914 | **Team Leader:** Led the project, built the database schema, developed core ETL scripts (import, snapshot, export), and integrated the full pipeline. Also handled data collection for firms 1–5. | % |
+| **Nguyen Phuong Ngan** | 11245914 | **Team Leader:** Led the project, built the database schema, developed core ETL scripts (import, snapshot, export), and integrated the full pipeline. Also handled data collection for firms 1–5. | 30% |
 | **Vu Thi Thuy Hang** | 11245873 | **Data Quality Analyst:** Collected data for firms 6–10, validated ownership and market data, and implemented QC checks. | 25% |
-| **Ta Ngoc Anh** | 11245844 | **Data & Documentation:** Collected data for firms 11–15, gathered innovation data (10 firms), and prepared the data dictionary, and reviewed the entire project after completion. | % |
-| **Le Pham Khanh Linh** | 11245892 | **Database Design:** Collected data for firms 16–20, gathered innovation data (10 firms), and designed the ERD and relational schema, and reviewed the entire project after completion. | % |
+| **Ta Ngoc Anh** | 11245844 | **Data & Documentation:** Collected data for firms 11–15, gathered innovation data (10 firms), and prepared the data dictionary, and reviewed the entire project after completion. | 22.5% |
+| **Le Pham Khanh Linh** | 11245892 | **Database Design:** Collected data for firms 16–20, gathered innovation data (10 firms), and designed the ERD and relational schema, and reviewed the entire project after completion. | 22.5% |
 
 ## 3. Project Structure
 ```text
 Team_2_FirmDataHub/
 │
 ├── README.md
+├── requirements.txt         # Python dependencies
 ├── run_pipeline.py          # Master pipeline script (RUN THIS!)
 │
 ├── sql/                     # Database schema and views
 │   ├── schema_and_seed.sql
 │   └── view.sql
 │
-├── etl/                     # ETL scripts (executed by run_pipeline.py)
-│   ├── init_snapshots.py
-│   ├── create_snapshot.py
-│   ├── import_firms.py
-│   ├── import_panel.py
-│   ├── qc_checks.py
-│   └── export_panel.py
+├── etl/                     # ETL scripts
+│   ├── __init__.py
+│   ├── db_connection.py     # Database connection helper
+│   ├── init_database.py     # Database initialization (creates schema)
+│   ├── init_snapshots.py    # Create 20 snapshots
+│   ├── create_snapshot.py   # Snapshot creation logic
+│   ├── import_firms.py      # Import firm master data
+│   ├── import_panel.py      # Import panel data
+│   ├── qc_checks.py         # Quality checks (6 rules)
+│   └── export_panel.py      # Export final dataset
 │
 ├── data/                    # Input data files
 │   ├── team_tickers.csv
 │   ├── firms.xlsx
 │   └── panel_2020_2024.xlsx
 │
-├── outputs/                 # Generated outputs
+├── outputs/                 # Generated outputs (created by pipeline)
 │   ├── qc_report.csv
 │   └── panel_latest.csv
 │
@@ -87,38 +88,16 @@ pip install -r requirements.txt
 
 ### Step 4: Create Database Schema
 
-**Option A: Using PowerShell (Windows)**
+**Open Terminal in VS Code and run:**
 ```bash
-Get-Content sql\schema_and_seed.sql | mysql -u root -p
+cd etl
+python init_database.py
 ```
+Enter your MySQL password when prompted.
 
-**Option B: Using MySQL CLI**
-```bash
-mysql -u root -p
-
-# Inside MySQL, run:
-source sql/schema_and_seed.sql;
-
-# If error, use full path (replace backslashes with forward slashes):
-source D:/Path/To/Team_2_FirmDataHub/sql/schema_and_seed.sql;
-
-# Exit MySQL
-EXIT;
-```
-
-**Important:** The full path must NOT contain:
-- Vietnamese characters (ú, ê, ô, etc.)
-- Spaces
-
-**Verify database creation:**
-```sql
-mysql -u root -p
-
-USE team2_firmhub;
-SHOW TABLES;
-# Should show 11 tables
-
-EXIT;
+**Expected output:**
+```text
+✅ Database initialized successfully!
 ```
 
 ### Step 5: Run Complete Pipeline
@@ -212,7 +191,7 @@ The QC checks validate 6 data quality rules. After running the pipeline, you wil
 
 **File:** `outputs/qc_report.csv`
 
-**Expected errors:** 3 errors for CII (all related to market_value_equity)
+**Expected errors:** 3 errors for CII (all related to `market_value_equity`)
 
 ### Why CII has errors?
 
@@ -220,7 +199,7 @@ The QC checks validate 6 data quality rules. After running the pipeline, you wil
 
 **Formula-based calculation:**
 ```
-market_value = shares_outstanding × share_price / 1,000,000,000
+market_value_equity = shares_outstanding × share_price
 ```
 
 **CII's actual values differ by >5% from this calculation because:**
@@ -319,47 +298,21 @@ mysql -u root -p team2_firmhub < ../sql/view.sql
 python export_panel.py
 ```
 
-## 10. Troubleshooting
-
-### Issue: Database not found
-```
-Error: Unknown database 'team2_firmhub'
-```
-**Solution:** Run Step 4 again to create the database schema.
-
-### Issue: File not found error
-```
-FileNotFoundError: ../data/firms.xlsx
-```
-**Solution:** Make sure you run `run_pipeline.py` from the root directory (`Team_2_FirmDataHub/`), not from `etl/` or other subdirectories.
-
-### Issue: Permission denied
-```
-Access denied for user 'root'
-```
-**Solution:** Check your MySQL password or verify MySQL is running.
-
-### Issue: Path contains spaces or Vietnamese characters
-**Solution:** Move the project folder to a path without spaces or special characters.
-Example:
-- ❌ Bad: `C:\Học tập\Đồ án\Team_2_FirmDataHub`
-- ✅ Good: `C:\Projects\Team_2_FirmDataHub`
-
-## 11. Data Sources
+## 10. Data Sources
 
 - **FiinPro:** Ownership data
 - **BCTC Audited:** Financial statements and cash flow
 - **Vietstock:** Market data
 - **Annual Reports:** Innovation indicators and firm metadata
 
-## 12. Version Control
+## 11. Version Control
 
 The database implements snapshot-based versioning:
 - Each firm-year observation can have multiple snapshots
 - Views always return the latest snapshot (MAX snapshot_id)
 - Historical data is preserved for audit trails
 
-## 13. Contact
+## 12. Contact
 
 For questions, issues, or collaboration inquiries, please contact the team leader.
 
