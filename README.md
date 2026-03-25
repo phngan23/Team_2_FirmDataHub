@@ -6,7 +6,6 @@ This project implements a Firm Data Hub for Vietnamese listed companies, includi
 **Dataset:** 20 Vietnamese listed firms × 5 years (2020-2024) = 100 observations with 38 variables
 
 ## 2. Team Members
-
 **| Name | Student ID | Role & Responsibilities | Contribution |**
 |------|------------|-------------------------|--------------|
 | **Nguyen Phuong Ngan** | 11245914 | **Team Leader:** Led the project, built the database schema, developed core ETL scripts (import, snapshot, export), and integrated the full pipeline. Also handled data collection for firms 1–5. | 30% |
