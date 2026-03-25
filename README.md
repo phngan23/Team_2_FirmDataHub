@@ -322,4 +322,5 @@ Team Leader: Nguyen Phuong Ngan
 - Phone: 0987836218
 
 Project Repository: https://github.com/phngan23/Team_2_FirmDataHub
+Project Drive: https://drive.google.com/drive/folders/1JaqQ27Q5MuAPk6OzFPDP2_An1mDOLFcc?usp=sharing
 ---
