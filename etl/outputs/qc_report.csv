@@ -1,0 +1,8 @@
+ticker,fiscal_year,field_name,error_type,message
+CII,2022,market_value_equity,INCONSISTENT,"Market value 3253665644700.00 inconsistent with shares 252,222,143 × price 9997.00 (expected 2521464763571.00, diff 29.0%)"
+CII,2023,market_value_equity,INCONSISTENT,"Market value 5491793024000.00 inconsistent with shares 318,364,813 × price 13662.00 (expected 4349500075206.00, diff 26.3%)"
+CII,2024,market_value_equity,INCONSISTENT,"Market value 4460546161350.00 inconsistent with shares 319,752,413 × price 11963.00 (expected 3825198116719.00, diff 16.6%)"
+DQC,2024,market_value_equity,INCONSISTENT,"Market value 275580660000.00 inconsistent with shares 27,558,066 × price 12600.00 (expected 347231631600.00, diff 20.6%)"
+HHV,2020,market_value_equity,INCONSISTENT,"Market value 2673840900000.00 inconsistent with shares 267,384,090 × price 12516.00 (expected 3346579270440.00, diff 20.1%)"
+HHV,2021,market_value_equity,INCONSISTENT,"Market value 2673840900000.00 inconsistent with shares 267,384,090 × price 19805.00 (expected 5295541902450.00, diff 49.5%)"
+HHV,2022,market_value_equity,INCONSISTENT,"Market value 3078044500000.00 inconsistent with shares 307,804,450 × price 7297.00 (expected 2246049071650.00, diff 37.0%)"
